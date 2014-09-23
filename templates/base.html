@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <!-- Set the viewport so this responsive site displays correctly on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Extra includes PRE-->
+    {% block extras_pre %}{%endblock %}
+
+    <link rel="stylesheet" href="/assets/icomoon/style.css">
+    <link rel="stylesheet" href="/scss/styles.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script type="text/javascript" src="/includes/jquery/jquery-2.1.0.min.js"></script>
+    <script src="/includes/modernizr.js"></script> <!-- Modernizr -->
+
+    <script src="/includes/feedback.js"></script>
+    <link rel="stylesheet" href="/assets/feedback.css" />
+
+    <style>
+    // Hack for now; TODO @Claudio
+    .b-centered { margin-top: 50px; }
+    </style>
+
+    <!-- Extra includes POST-->
+    {% block extras_post %}{%endblock %}
+
+    <title>{% block title %}{% endblock %}</title>
+
+
+</head>
+
+<body>
+  <nav class="b-navigation" role="navigation">
+    <h2 class="e-nav-title">Menu</h2>
+    <a href="/">Home</a>
+    <a href="#">People</a>
+    <a href="#">Projects</a>
+    <a href="#">Resources</a>
+    <a href="#">My Dashboard</a>
+    {% if me %}
+    <a href="/profile"><img class="avatar" alt="{{me|fullName}}" src="{{me.photoUrl|defaultPicture}}"/></a>
+    {% else %}
+      {% if invalidUser == True %}
+      <a href="{{logout_url}}">!! Sign-out !!</a>
+      {% else %}
+      <a href="{{login_url}}">Sign-in</a>
+      {% endif %}
+    {% endif %}
+  </nav>
+  
+  <div class="b-top-layer">
+    <header role="header">
+      <div class="b-centered">
+        <span id="main-navigation-trigger" class="e-trigger icon-menu"></span>
+        
+        <div class="b-branding">
+          <a href="#" class="e-govlab-logo"><img src="/assets/govlab-logo.png" alt=""></a>
+        </div>
+      </div>
+    </header>
+
+{% block content %}{% endblock %}
+  </div>
+<!-- Nothing for now.
+    <footer>
+        <div class="b-centered">
+            <div class="b-footer-section">
+              <h3>Learn More</h3>
+              <p>…</p>
+            </div>
+            <div class="b-footer-section">
+              <h3>Apply for the Academy</h3>
+              <p>…</p>
+            </div>
+            <div class="b-footer-section">
+              <h3>GovLab@NYU</h3>
+              <p>…</p>
+            </div>
+        </div>
+    </footer>
+  </div>
+-->
+
+
+<script type="text/javascript" src="/includes/scripts.js"></script>
+
+    <!-- ADD Google Analytics. -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-54283373-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+<script type="text/javascript">
+  $.feedback({
+    ajaxURL: '/feedback',
+    html2canvasURL: '/includes/html2canvas.js'
+        });
+    </script>
+
+
+{% block script_post %}{% endblock %}
+
+
+  <!-- ADD Feedback module. -->     
+
+  <script type="text/javascript" src="//use.typekit.net/mvn5qfr.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+</body>
+
+</html>
