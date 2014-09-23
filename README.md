@@ -5,6 +5,9 @@ govlab-intranet
 * update users; check domain org unit and create users accordingly.
 * new project; title + list of members.
 
+1. cron-job every day to make sure we have all people in the system.
+2. manual admin inteface to force refresh.
+
 == Projects ==
 * list all projects
 * link to Producteev page
