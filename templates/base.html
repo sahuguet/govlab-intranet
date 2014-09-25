@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/css/dashboard.css">
     <script type="text/javascript" src="/includes/jquery/jquery-2.1.0.min.js"></script>
     <script src="/includes/modernizr.js"></script> <!-- Modernizr -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
     <script src="/includes/feedback.js"></script>
     <link rel="stylesheet" href="/assets/feedback.css" />
@@ -35,12 +36,12 @@
   <nav class="b-navigation" role="navigation">
     <h2 class="e-nav-title">Menu</h2>
     <a href="/">Home</a>
-    <a href="#">People</a>
-    <a href="#">Projects</a>
+    <a href="/team">Team</a>
+    <a href="/project/all">Projects</a>
     <a href="#">Resources</a>
     <a href="#">My Dashboard</a>
-    {% if me %}
-    <a href="/profile"><img class="avatar" alt="{{me|fullName}}" src="{{me.photoUrl|defaultPicture}}"/></a>
+    {% if self %}
+    <a href="/profile"><img class="avatar" alt="{{myself|fullName}}" src="{{myself.photoUrl|defaultPicture}}"/></a>
     {% else %}
       {% if invalidUser == True %}
       <a href="{{logout_url}}">!! Sign-out !!</a>

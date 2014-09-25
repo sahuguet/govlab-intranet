@@ -10,6 +10,7 @@ builtins:
 skip_files:
 - ^(.*/)?\.scss$
 - ^(.*/)?\.scssc$
+- ^(.*/)?\.pyc$
 
 handlers:
 - url: /favicon\.ico
@@ -77,6 +78,7 @@ handlers:
 
 - url: .*
   script: main.app
+  login: required
 
 libraries:
 - name: webapp2

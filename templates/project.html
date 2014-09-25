@@ -1,0 +1,36 @@
+{% extends "templates/base.html" %}
+{% block title %}Project {{project.title}}{% endblock %}
+{% block extras_pre %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<section class="b-centered b-content">
+    <h1>Project: {{project.title}}
+    </h1>
+  
+    <form action="/project/{{project.key.id() if project.key else 'new'}}" METHOD="POST">
+    <div class="b-half">
+        <input type="hidden" name="profileId" value="{{profileId}}"/>
+    <label for="name">Title</label>
+        <input type="text" class="form-control" placeholder="Project title" name="title" value="{{project.title}}">
+        <label for="name">Team</label>
+        <input type="text" class="form-control" placeholder="Team members" name="members" value="{{project.members|asList}}">
+        <label for="name">Google Drive Folder</label>
+<input type="text" class="form-control" placeholder="Project folder" name="folder" value="{{project.folder}}">
+    </div>
+
+  <div class="b-half">
+    <label for="name">Project description</label>
+      <textarea class="form-control" cols="80" rows="4" placeholder="Provide a short description of the project" name="description">{{project.description}}</textarea>
+    </div>
+
+    <div class="b-form-section">
+        <button type="submit" class="b-button">Update the project</button>
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "templates/base.html" %}
+{% block title %}The GovLab Academy{% endblock %}
+{% block extras_pre %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<section class="b-centered b-content">
+  {% if myself.email != user.email %}
+    <h1>
+      {{user|defaultName}}'s profile &nbsp;
+      <img class="avatar-x2" alt="{{user.fname}} {{user.lname}}" src="{{user.photoUrl|defaultPicture}}"/>
+    </h1>
+  {% else %}
+  	<h1>My public profile</h1>
+  {% endif %}
+
+
+    <form action="/profile" METHOD="POST">
+    <div class="b-half">
+        <input type="hidden" name="profileId" value="{{profileId}}"/>
+        <label for="name">Name</label>
+        <input type="text" class="form-control" placeholder="First Name" name="fname" value="{{user.fname}}">
+        <input type="text" class="form-control" placeholder="Last Name" name="lname" value="{{user.lname}}">
+
+        <label for="city_state">Location</label>
+        <input type="text" class="form-control" placeholder="City, State" name="city_state" value="{{user_profile.city_state}}">
+        <input type="text" class="form-control" placeholder="Country" name="country" value="{{user_profile.country}}">
+
+        <label for="name">Social networks</label>
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-facebook-square"></i></span>
+          <input type="text" class="form-control" placeholder="your facebook account" name="facebook" value="{{user_profile.facebook}}">
+        </div>
+
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-twitter-square"></i></span>
+          <input type="text" class="form-control" placeholder="your Twitter handle" name="twitter" value="{{user_profile.twitter}}">
+        </div>
+
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-github"></i></span>
+          <input type="text" class="form-control" placeholder="your GitHub account" name="github" value="{{user_profile.github}}">
+        </div>
+
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-linkedin-square"></i></span>
+          <input type="text" class="form-control" placeholder="your LinkedIn account" name="linkedin" value="{{user_profile.linkedin}}">
+        </div>
+    </div>
+    <div class="b-half m-right">
+        <label for="year_experience">Experience</label>
+        <select class="form-control" name="year_experience" value="{{user_profile.year_experience}}">
+            <option>1 year</option>
+            <option>2 years</option>
+            <option>3 years</option>
+            <option>4 years</option>
+            <option>5+ years</option>
+        </select>       
+        <select class="form-control" name="sector_experience" value="{{user_profile.sector_experience}}">
+           <option>Academia</option>
+           <option>Industry</option>
+           <option>Public Sector</option>
+           <option>Entrepreneur</option>
+        </select>
+        <label for="name">Your experience</label>
+        <textarea class="form-control" cols="80" rows="4" placeholder="Tell us about your Experience" name="experience">{{user_profile.experience}}</textarea>
+        <label for="name">Your expertise</label>
+        <textarea class="form-control" cols="80" rows="4" placeholder="Tell us about your credentials, experience, skills and interests. Using keywords, summarize your credentials (degres and subjects)" name="expertise">{{user_profile.expertise}}</textarea>
+    </div>
+    <div class="b-form-section">
+        <h4>Skill "Marketplace"</h4>
+        <div class="b-half">
+          <label for="name">Skills you can offer</label>
+            <textarea class="form-control" placeholder="Using keywords, summarize your skills. (e.g. what do you do well)" name="offer" >{{user_profile.offer}}</textarea>     
+        </div>
+        <div class="b-half m-right">
+          <label for="name">Interests you have</label>
+            <textarea class="form-control" placeholder="Using keywords, summarize your interests. (e.g. topics about which you are passionate)" name="demand"  >{{user_profile.demand}}</textarea>    
+        </div>
+    </div>
+
+    {# Update button present, only for people who can edit the profile. #}
+    {% if readonly != True %}
+    <div class="b-form-section">
+        <button type="submit" class="b-button">Update the profile</button>
+    </div>
+    {% endif %}
+    
+    {# Google+ link present, only if this is your own profile. #}
+    {% if myself.email == profileId %}
+    <div class="b-form-section">
+      <a href="/googleplus">fetch my GooglePlus picture</a>
+    </div>
+    {% endif %}
+    </form>
+    <script>
+    // jQuery code to make sure the <select> display the correct value, as encoded by @value.
+    $(document).ready(function() {
+      $('select').children('option').each(function(i,v) {
+        if (v.text == $(v).parent().attr('value')) {
+          $(v).attr('selected','')
+        }
+      });
+    });
+    </script>
+</section>
+
+{% endblock %}
+
+{% block script_post %}
+{% if readonly == True %}
+<script>
+  $(document).ready(function() {
+    $('form :input').attr('disabled', true);
+  });
+</script>
+{% endif %}
+{% endblock %}

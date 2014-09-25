@@ -3,6 +3,32 @@
 
 {% block content %}
 
-<!-- PUT YOUR CONTENT HERE -->
+<section class="b-centered b-dashboard-header">
+  <h1 class="e-page-title">Dashboard</h1>
+  <p class="e-username">Welcome {{myself|fullName}} (<a href="{{logout_url}}">logout</a>)</p>
+</section>
+
+<section class="b-centered b-content">     
+	<h1>GovLab Calendar</h1>
+	<div class="e-content">
+		<iframe src="https://www.google.com/calendar/embed?src=thegovlab.org_2hbpu0hgtvcds11ajeuur0g5po%40group.calendar.google.com&ctz=America/New_York&showTitle=1" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+	</div>
+</section>
+
+<section class="b-centered b-content">
+	<div class="b-half">
+		<h1>My weekly snippet</h1>
+		<div id="b-snippets" class="e-half-content">
+			<iframe src="/snippet/?embedded=true" height="400px" frameborder="0" width="100%"></iframe>
+		</div>
+	</div>
+
+	<div class="b-half">
+		<h1>My working documents</h1>
+		<div class="e-half-content">
+			<iframe src="https://drive.google.com/a/thegovlab.org/embeddedfolderview?id=0B-BTzZGOWDTHc3ZNcWlKaUpSU00#list" width="100%" height="600px" frameborder="0"></iframe>
+		</div>
+	</div>
+</section>
 
 {% endblock %}

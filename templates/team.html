@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+{% block title %}The GovLab Team{% endblock %}
+
+{% macro userProfile(user) -%}
+    <li><img class="avatar" alt="{{user|fullName}}" src="{{user.photoUrl|defaultPicture}}"/>	
+    	<a href="/profile?user_email={{user|primaryEmail}}">{{user|fullName}}</a>
+    	<a href="mailto:{{user|primaryEmail}}"><i class="fa fa-paper-plane"></i></a>
+    	</li>
+{%- endmacro %}
+
+{% block content %}
+
+<section class="b-centered b-content">
+	<h2>The GovLab Team</h2>
+		<ul>
+		{% for user in team %}
+    	{{userProfile(user)}}
+		{% endfor %}
+		</ul>
+</section>
+
+{% endblock %}
