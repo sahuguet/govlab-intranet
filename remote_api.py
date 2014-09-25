@@ -77,5 +77,10 @@ def createRandomProjects():
 	p.put()
 
 #print Project.get_by_id(long('5629499534213120'))
-from domain_services import createNewUser
-createNewUser('Lisbeth', 'Salander', 'lisbeth@thegovlab.org')
+#from domain_services import createNewUser
+#createNewUser('Lisbeth', 'Salander', 'lisbeth@thegovlab.org')
+from model import ProjectSnippet
+p = ProjectSnippet(parent=ndb.Key("Project", 124), id=int(45), content="")
+p.put()
+print dir(p.key)
+print p.key.parent().id()

@@ -50,6 +50,10 @@ handlers:
   script: snippet.app
   login: required
 
+- url: /project-snippet/.*
+  script: project_snippet.app
+  login: required
+
 - url: /feedback
   script: feedback.app
 

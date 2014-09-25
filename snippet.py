@@ -28,10 +28,7 @@ class SnippetHandler(webapp2.RequestHandler):
                 "end": "{:%d, %b %Y (%a)}".format(end_date) }
 
     def get(self, _userEmail=None, _week=None):
-        logging.info("_user = %s, _week=%s" % (_userEmail, _week))
-        logging.info("Current user: " + users.get_current_user().email())
         myself = users.get_current_user()
-
         current_week = (datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7
         isEmbed = self.request.get("embedded", default_value="false")
 
