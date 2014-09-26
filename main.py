@@ -32,6 +32,8 @@ class ProfileHandler(webapp2.RequestHandler):
 	def get(self):
 		if self.request.get('user_email'):
 			userProfile = UserProfile.getFromEmail(self.request.get('user_email'))
+			if userProfile is None:
+				self.abort(404)
 		else:
 			userProfile = getMyProfile()
 		(template_data, template) = get_template('templates/profile.html')
@@ -58,8 +60,8 @@ class ProfileHandler(webapp2.RequestHandler):
 			user_profile_json[field] = self.request.get(field)
 		userProfile.profile = json.dumps(user_profile_json)
 		userProfile.put()
-		logging.info('profile stored')
-		self.redirect('/profile?%s' % profileId)
+		logging.info('profile stored for %s' % profileId)
+		self.redirect('/profile?user_email=%s' % profileId)
 
 class AllProjectsHandler(webapp2.RequestHandler):
 	def get(self):
