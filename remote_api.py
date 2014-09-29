@@ -79,8 +79,20 @@ def createRandomProjects():
 #print Project.get_by_id(long('5629499534213120'))
 #from domain_services import createNewUser
 #createNewUser('Lisbeth', 'Salander', 'lisbeth@thegovlab.org')
-from model import ProjectSnippet
-p = ProjectSnippet(parent=ndb.Key("Project", 124), id=int(45), content="")
-p.put()
-print dir(p.key)
-print p.key.parent().id()
+from model import ProjectSnippet, UserSnippet
+#p = ProjectSnippet(parent=ndb.Key("Project", 124), id=int(45), content="")
+#p.put()
+#print dir(p.key)
+#print p.key.parent().id()
+#s = UserSnippet.createSnippet('arnaud3@thegovlab.org', 12, 'test')
+#s.put()
+#s = UserSnippet.createSnippet('arnaud2@thegovlab.org', 12, 'test')
+#s.put()
+#for i in [7,6,5,8]:
+#	s = UserSnippet.createSnippet('arnaud%d@thegovlab.org' % i, 12, 'test')
+#	s.put()
+#for s in UserSnippet.getAllSnippetsByWeek(12):
+#	print s.key.id()
+all_users =  [k.id() for k in UserProfile.query().fetch(keys_only=True)]
+users_with_snippets = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(38)]
+print set(all_users) - set(users_with_snippets)

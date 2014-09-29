@@ -1,12 +1,19 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "libs"))
+
 import jinja2
 import json
 import logging
-import os
+import markdown2
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
+
+MD = markdown2.Markdown()
 
 # We define a bunch of filters to make the templates simpler and catch bad data.
 JINJA_ENVIRONMENT.filters['getProfile'] = lambda x: getUsersMapping().setdefault(x, x)
@@ -19,6 +26,7 @@ JINJA_ENVIRONMENT.filters['primaryEmail'] = lambda x: x.key.id()
 JINJA_ENVIRONMENT.filters['projectId'] = lambda x: x.key.id()
 JINJA_ENVIRONMENT.filters['projectTitle'] = lambda x: x.title if x.title != '' else "Untitled project"
 JINJA_ENVIRONMENT.filters['asList'] = lambda x: ", ".join(x)
+JINJA_ENVIRONMENT.filters['markdown'] = lambda x: MD.convert(x)
 
 from google.appengine.api import users
 from model import UserProfile

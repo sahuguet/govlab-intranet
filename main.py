@@ -99,6 +99,20 @@ class NewProjectHandler(webapp2.RequestHandler):
 		project.put()
 		self.redirect('/project/%s' % project.key.id())
 
+from snippet import SnippetHandler
+from model import UserSnippet
+from datetime import datetime
+from datetime import timedelta
+class WallOfShameHandler(webapp2.RequestHandler):
+	def get(self):
+		(template_data, template) = get_template('templates/wall_of_shame.html')
+		all_users = [k.id() for k in UserProfile.query().fetch(keys_only=True)]
+		current_week = (datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7
+		snippets_good = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(current_week)]
+		template_data['snippets_good'] = sorted(snippets_good)
+		template_data['snippets_bad'] = sorted(list(set(all_users) - set(snippets_good)))
+		self.response.out.write(template.render(template_data))
+
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
 	('/team', TeamHandler),
@@ -106,4 +120,5 @@ app = webapp2.WSGIApplication([
 	('/project/all', AllProjectsHandler),
 	(r'/project/(\d+)$', ProjectHandler),
 	('/project/new', NewProjectHandler),
+	('/wall-of-shame', WallOfShameHandler),
 ], debug=True)

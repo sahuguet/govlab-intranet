@@ -31,6 +31,18 @@ class UserSnippet(ndb.Model):
 	"""
 	content = ndb.TextProperty()
 
+	@classmethod
+	def getSnippet(cls, userEmail, week):
+		return cls.get_by_id(parent=ndb.Key("Week", int(week)), id=userEmail)
+
+	@classmethod
+	def getAllSnippetsByWeek(cls, week):
+		return cls.query(ancestor=ndb.Key("Week", int(week))).fetch()
+
+	@classmethod
+	def createSnippet(cls, userEmail, week, content):
+		return UserSnippet(parent=ndb.Key("Week", int(week)), id=userEmail, content=content)
+
 class Project(ndb.Model):
 	"""NDB model for a project."""
 	#shortName = ndb.StringProperty(required=True)

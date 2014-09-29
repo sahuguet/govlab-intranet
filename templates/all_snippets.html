@@ -1,0 +1,19 @@
+{% extends "templates/base.html" %}
+{% block title %}Snippets for all users{% endblock %}
+
+{% block content %}
+
+<section class="b-centered b-content">
+<h1>Summary of GovLab users weekly snippets</h1>
+
+<ul>
+{% for key, value in snippets.iteritems() %}
+	<li>Weekly snippet for {{key}}:
+		<div style="border: 1px solid black;">{{value|markdown|safe}}
+		</div>
+	</li>
+{% endfor %}
+</ul>
+</section>
+
+{% endblock %}

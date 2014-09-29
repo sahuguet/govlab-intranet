@@ -1,0 +1,44 @@
+{% extends "templates/base.html" %}
+{% block title %}Wall of Shame{% endblock %}
+
+{% block extras_post %}
+<style>
+
+h2.good {
+	color: #38F028;
+}
+
+li.good::before {
+	border-left: 6px solid #38F028;
+};
+
+</style>
+
+{%endblock %}
+
+{% block content %}
+
+<section class="b-centered b-content">
+<h1>Snippet completion</h1>
+
+<div class="b-half">
+	<h2 class="good">Users in good standing ({{snippets_good|length}})</h2>
+	<ul>
+	{% for user in snippets_good %}
+		<li class="good">{{user}}</li>
+	{% endfor %}
+	</ul>
+</div>
+
+<div class="b-half">
+	<h2>Delinquent users ({{snippets_bad|length}})</h2>
+	<ul>
+	{% for user in snippets_bad %}
+		<li>{{user}}</li>
+	{% endfor %}
+	</ul>
+</div>
+
+</section>
+
+{% endblock %}
