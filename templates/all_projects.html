@@ -1,9 +1,23 @@
 {% extends "templates/base.html" %}
 {% block title %}The GovLab Projects{% endblock %}
 
+{% block extras_post %}
+<style>
+.gl-tag {
+	border: 1px solid black;
+	padding: 2px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px; /* future proofing */
+	-khtml-border-radius: 10px; /* for old Konqueror browsers */
+}
+</style>
+{%endblock %}
+
 {% macro projectProfile(project) -%}
     <li><h3><a href="/project/{{project|projectId}}">{{project|projectTitle}}</a></h3>
     		<p>{{project.description}}</p>
+    		<p>Tags: {% for tag in project.tags %} <span class="gl-tag">{{tag}}</span> &nbsp; {% endfor %}</p>
     		<p>Team: {% for member in project.members %} <a href="/profile?user_email={{member}}">{{member.split('@')[0]}}</a>{% endfor %}</p>
     </li>
 {%- endmacro %}

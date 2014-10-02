@@ -3,45 +3,189 @@
 {% block extras_pre %}
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+<style>
+.checkboxes label {
+    display: block;
+    float: left;
+    padding-right: 10px;
+    padding-left: 22px;
+    text-indent: -22px;
+    font-weight: 200;
+}
+.checkboxes input[type=checkbox] {
+  margin: 5px 5px 5px 5px;
+}
+</style>
+
+
 {% endblock %}
 
 {% block content %}
 
+<form action="/project/{{project.key.id() if project.key else 'new'}}" METHOD="POST">
+
 <section class="b-centered b-content">
   <h1>Project: {{project.title}}</h1>
   
+<div class="b-form-section">
+    <button type="submit" class="b-button">Update the project</button>
+  </div>
+
   <div class="b-half">
-    <form action="/project/{{project.key.id() if project.key else 'new'}}" METHOD="POST">
+    
+
     <label for="name">Title</label>     
     <input type="text" class="form-control" placeholder="Project title" name="title" value="{{project.title}}">
+
+    <label for="name">Project Area</label>
+    <div class="form-control">
+    <label class="checkbox-inline">
+    <input type="checkbox" name="project_area" value="data_gov" {{ 'checked' if 'data_gov' in project.project_areas }}>Data.gov
+    </label>
+    <label class="checkbox-inline">
+    <input type="checkbox" name="project_area" value="people_gov" {{ 'checked' if 'people_gov' in project.project_areas }}>People.gov
+    </label>
+    <!--
+    <label class="checkbox-inline">
+    <input type="checkbox" name="project_area" value="we_gov" {{ 'checked' if 'we_gov' in project.project_areas }}>We.gov
+    </label>
+  -->
+    <label class="checkbox-inline">
+    <input type="checkbox" name="project_area" value="academy" {{ 'checked' if 'academy' in project.project_areas }}>Academy
+    </label>
+    <label class="checkbox-inline">
+    <input type="checkbox" name="project_area" value="internal_tool" {{ 'checked' if 'internal_tool' in project.project_areas }}>Tools
+    </label>
+    </div> 
+
+    <label for="name">Tags</label>
+    <input type="text" class="form-control" placeholder="tags" name="tags" value="{{project.tags|asList}}">
 
     <label for="name">Team</label>
     <input type="text" class="form-control" placeholder="Team members" name="members" value="{{project.members|asList}}">
 
-    <label for="name">Google Drive Folder</label>
-    <input type="text" class="form-control" placeholder="Project folder" name="folder" value="{{project.folder}}">
+    <label for="name">Project Lead</label>
+    <input type="text" class="form-control" placeholder="Team members" name="project_lead" value="{{project.project_lead}}">
 
     <label for="name">Project description</label>
     <textarea class="form-control" cols="80" rows="4" placeholder="Provide a short description of the project" name="description">{{project.description}}</textarea>
 
-    <div class="b-form-section">
-      <button type="submit" class="b-button">Update the project</button>
-    </div>
-    </form>
+    <label for="name">Google Drive Folder</label>
+    <input type="text" class="form-control" placeholder="Project folder" name="folder" value="{{project.folder}}">
+
   </div>
 
   <div class="b-half">
-
-{# Project snippet only for existing projects. #}
-{% if project.key %}
+  {# Project snippet only for existing projects. #}
+  {% if project.key %}
     <label for="name">Weekly snippet</label>
     <div id="b-snippets" class="e-half-content">
-      <iframe src="/project-snippet/{{project.key.id()}}?embedded=true" height="600px" frameborder="0" width="100%"></iframe>
+      <iframe src="/project-snippet/{{project.key.id()}}?embedded=true" height="400px" frameborder="0" width="100%"></iframe>
     </div>
-{% endif %}
+  {% endif %}
   </div>
+</section>
+
+{% macro deliverable(value) -%}
+<label><input type="checkbox" name="project_deliverables" value="{{value}}" {{'checked' if value in project.project_deliverables}}>{{value}}</label>
+{%- endmacro %}
+
+{% macro resources(value) -%}
+<label><input type="checkbox" name="project_resources" value="{{value}}" {{'checked' if value in project.project_resources}}>{{value}}</label>
+{%- endmacro %}
+
+<section class="b-centered b-content">
+  <h1>Deliverables</h1>
+
+<div class="b-half">
+  <label for="name">Deliverables</label>
+  <div class="checkboxes">
+    {% for item in [ 'software', 'website', 'document', 'infographics', 'engagement action', 'consulting', 'event', 'training', 'curriculum', 'legal advice', 'policy']|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
 
 </section>
 
+<section class="b-centered b-content">
+  <h1>Resources &amp; Needs</h1>
+
+<div class="b-half">
+  <label for="name">Administrative Needs</label>
+  <div class="checkboxes">
+    {% for item in [ 'legal contract', 'business agreement', 'IRB', 'budget', 'grant writing', 'coordination with funders', 'finance', 'press release', 'travel', 'project management' ]|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="b-half">
+  <label for="name">Research resources</label>
+  <div class="checkboxes">
+    {% for item in [ 'bibliographic (no expertise required)', 'bibliographic (expertise required)',  'legal', 'patent', 'analysis', 'ethnography']|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="b-half">
+  <label for="name">Writing resources</label>
+  <div class="checkboxes">
+    {% for item in [ 'documentation', 'technical writing', 'translation', 'blog', 'memo', 'article', 'book', 'internal report', 'funding report']|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="b-half">
+  <label for="name">Language resources</label>
+  <div class="checkboxes">
+    {% for item in [ 'french', 'spanish', 'russian', 'chinese', 'japanese', 'german', 'portuguese' ]|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="b-half">
+  <label for="name">Technology</label>
+  <div class="checkboxes">
+    {% for item in [ 'HTML pages (static)', 'HTML pages (dynamic)', 'web site', 'web app', 'native app (iOS)', 'native app (Android)', 'native app (other)', 'infrastructure', 'data science', 'data visualization' ]|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="b-half">
+  <label for="name">User Experience – Graphic Design</label>
+  <div class="checkboxes">
+    {% for item in [ 'logo, icons', 'infographics', 'wireframes', 'mocks', 'artifacts for events', 'other' ]|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="b-half">
+  <label for="name">Communication resources</label>
+  <div class="checkboxes">
+    {% for item in [ 'copy for website', 'press release', 'brochure', 'branding', 'social media content', 'social media analytics' ]|sort %}
+    {{deliverable(item)}}
+    {% endfor %}
+  </div>
+</div>
+
+</section>
+
+<section class="b-centered b-content">
+  <div class="b-form-section">
+    <button type="submit" class="b-button">Update the project</button>
+  </div>
+</section>
+
+</form>
+
+
 
 {% endblock %}
+

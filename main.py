@@ -82,7 +82,12 @@ class ProjectHandler(webapp2.RequestHandler):
 		project.title = self.request.get('title')
 		project.description = self.request.get('description')
 		project.members = map(lambda x:x.strip(), self.request.get('members').split(','))
+		project.tags = map(lambda x:x.strip(), self.request.get('tags').split(','))
 		project.folder = self.request.get('folder')
+		project.project_lead = self.request.get('project_lead')
+		project.project_areas = self.request.get('project_area', allow_multiple=True)
+		project.project_deliverables = self.request.get('project_deliverables', allow_multiple=True)
+		project.project_resources = self.request.get('project_resources', allow_multiple=True)
 		project.put()
 		self.redirect('/project/%s' % projectId)
 
@@ -96,6 +101,13 @@ class NewProjectHandler(webapp2.RequestHandler):
 		project = Project(title=self.request.get('title'),
 			description=self.request.get('description'),
 			members=map(lambda x:x.strip(), self.request.get('members').split(',')))
+		# TODO (arnaud): fix that; this is a repeat of the other method.
+		project.tags = map(lambda x:x.strip(), self.request.get('tags').split(','))
+		project.folder = self.request.get('folder')
+		project.project_lead = self.request.get('project_lead')
+		project.project_areas = self.request.get('project_area', allow_multiple=True)
+		project.project_deliverables = self.request.get('project_deliverables', allow_multiple=True)
+		project.project_resources = self.request.get('project_resources', allow_multiple=True)
 		project.put()
 		self.redirect('/project/%s' % project.key.id())
 
@@ -108,9 +120,15 @@ class WallOfShameHandler(webapp2.RequestHandler):
 		(template_data, template) = get_template('templates/wall_of_shame.html')
 		all_users = [k.id() for k in UserProfile.query().fetch(keys_only=True)]
 		current_week = (datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7
-		snippets_good = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(current_week)]
+		# We check snippets from last week.
+		snippets_good = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(current_week-1)]
 		template_data['snippets_good'] = sorted(snippets_good)
 		template_data['snippets_bad'] = sorted(list(set(all_users) - set(snippets_good)))
+		self.response.out.write(template.render(template_data))
+
+class ProjectResourceHandler(webapp2.RequestHandler):
+	def get(self):
+		(template_data, template) = get_template('templates/project_resource.html')
 		self.response.out.write(template.render(template_data))
 
 app = webapp2.WSGIApplication([
@@ -121,4 +139,5 @@ app = webapp2.WSGIApplication([
 	(r'/project/(\d+)$', ProjectHandler),
 	('/project/new', NewProjectHandler),
 	('/wall-of-shame', WallOfShameHandler),
+	('/project-resource', ProjectResourceHandler)
 ], debug=True)

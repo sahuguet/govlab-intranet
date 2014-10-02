@@ -16,7 +16,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True)
 
 class SnippetHandler(webapp2.RequestHandler):
-  SNIPPET_START_DATE = datetime(2014, 1, 1) # First Wed of 2014 
+  SNIPPET_START_DATE = datetime(2014, 1, 6) # First Mon of 2014 
 
   @staticmethod
   def weekRange(week):
@@ -89,9 +89,9 @@ class SnippetHandler(webapp2.RequestHandler):
 class AllUserSnippetsHandler(webapp2.RequestHandler):
   def get(self):
     current_week = (datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7
-    # We get all the snipptet for a given week.
+    # We get all the snipptet for the week before.
     snippets = {}
-    for s in UserSnippet.getAllSnippetsByWeek(current_week):
+    for s in UserSnippet.getAllSnippetsByWeek(current_week-1):
       snippets[s.key.id()] = s.content
     (template_data, template) = get_template('templates/all_snippets.html')
     template_data['snippets'] = snippets

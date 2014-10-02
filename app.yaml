@@ -76,6 +76,12 @@ handlers:
   script: googleplus.app
   login: required
 
+- url: /linkedin
+  script: linkedin.app
+
+- url: /linkedin-callback
+  script: linkedin.app
+
 - url: /dashboard
   script: main.app
   login: required

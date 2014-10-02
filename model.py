@@ -22,7 +22,7 @@ class UserProfile(ndb.Model):
 	def getJsonFields(cls):
 		return ['fname', 'lname', 'city_state', 'country',
 		'facebook', 'twitter', 'github', 'linkedin',
-		'year_experience', 'sector_experience', 'experience', 'demand', 'offer']
+		'year_experience', 'sector_experience', 'experience', 'expertise', 'demand', 'offer']
 
 class UserSnippet(ndb.Model):
 	"""NDB model for a user weekly snippet.
@@ -51,6 +51,11 @@ class Project(ndb.Model):
 	members = ndb.StringProperty(repeated=True)
 	folder = ndb.StringProperty()
 	groupName = ndb.StringProperty()
+	tags = ndb.StringProperty(repeated=True)
+	project_lead = ndb.StringProperty()
+	project_areas = ndb.StringProperty(repeated=True)
+	project_deliverables = ndb.StringProperty(repeated=True)
+	project_resources = ndb.StringProperty(repeated=True)
 
 	@classmethod
 	def getFromId(cls, id):
