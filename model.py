@@ -9,6 +9,7 @@ class UserProfile(ndb.Model):
 	photoUrl = ndb.StringProperty()
 	profile = ndb.TextProperty() # JSON file with user's profile info.
 	date = ndb.DateTimeProperty(auto_now_add=True)
+	linkedin = ndb.JsonProperty()
 
 	@classmethod
 	def getFromGAE(cls, appEngineUser):
@@ -31,6 +32,9 @@ class UserSnippet(ndb.Model):
 	"""
 	content = ndb.TextProperty()
 
+	def getWeekAndUser(self):
+		return (self.key.parent().id(), self.key.id())
+
 	@classmethod
 	def getSnippet(cls, userEmail, week):
 		return cls.get_by_id(parent=ndb.Key("Week", int(week)), id=userEmail)
@@ -47,15 +51,22 @@ class Project(ndb.Model):
 	"""NDB model for a project."""
 	#shortName = ndb.StringProperty(required=True)
 	title = ndb.StringProperty(required=False)
-	description = ndb.TextProperty(indexed=True, required=True)
+	description = ndb.TextProperty(indexed=False, required=True)
 	members = ndb.StringProperty(repeated=True)
 	folder = ndb.StringProperty()
+	calendar = ndb.StringProperty()
 	groupName = ndb.StringProperty()
 	tags = ndb.StringProperty(repeated=True)
 	project_lead = ndb.StringProperty()
 	project_areas = ndb.StringProperty(repeated=True)
 	project_deliverables = ndb.StringProperty(repeated=True)
 	project_resources = ndb.StringProperty(repeated=True)
+	canvas = ndb.JsonProperty()
+
+	# We define the fields: canvas_question_[1-20] and pixar_[1-5]
+	@staticmethod
+	def getCanvasFields():
+		return [ "canvas_question_%d" % k for k in range(1,21)] + [ "pixar_%d" % k for k in range(1,6) ]
 
 	@classmethod
 	def getFromId(cls, id):
@@ -65,3 +76,5 @@ class ProjectSnippet(ndb.Model):
 	"""NDB model for a project weekly snippet.
 	"""
 	content = ndb.TextProperty()
+
+

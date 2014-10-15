@@ -23,6 +23,7 @@ remote_api_stub.ConfigureRemoteApi(None, '/_ah/remote_api', auth_func,
   'govlab-intranet.appspot.com'
   )
 
+"""
 import httplib2
 from apiclient.discovery import build
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -39,11 +40,9 @@ credentials = SignedJwtAssertionCredentials(SERVICE_ACCOUNT_EMAIL,
 http = httplib2.Http()
 http = credentials.authorize(http)
 service = build('admin', 'directory_v1', http=http)
+"""
 
 #print service.users()
-#for user in service.users().list(domain='thegovlab.org', maxResults=500).execute()['users']:
-#	if user['orgUnitPath'] == '/':
-#		print user
 
 def createDomainUsers():
 	from domain_services import createNewUser
@@ -93,6 +92,34 @@ from model import ProjectSnippet, UserSnippet
 #	s.put()
 #for s in UserSnippet.getAllSnippetsByWeek(12):
 #	print s.key.id()
-all_users =  [k.id() for k in UserProfile.query().fetch(keys_only=True)]
-users_with_snippets = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(38)]
-print set(all_users) - set(users_with_snippets)
+#all_users =  [k.id() for k in UserProfile.query().fetch(keys_only=True)]
+#users_with_snippets = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(38)]
+#print set(all_users) - set(users_with_snippets)
+#print UserProfile.get_by_id('arnaud@thegovlab.org').linkedin['profile']['summary']
+
+def getUserLinkedinData():
+	profiles = []
+	for profile in UserProfile.query().fetch():
+		if profile.linkedin: profiles.append(profile.linkedin['profile'])
+	print json.dumps(profiles)
+
+#getUserLinkedinData()
+
+#for user in service.users().list(domain='thegovlab.org', maxResults=500).execute()['users']:
+#	print user['primaryEmail']
+
+RANGE = range(36,42)
+all_users = UserProfile.query().fetch()
+snippet_stats = {}
+for user in all_users:
+	snippet_stats [user.key.id()] = {}
+all_snippets = []
+for i in RANGE:
+	all_snippets.extend(UserSnippet.getAllSnippetsByWeek(i))
+print "%d snippets found." % len(all_snippets)
+for snippet in all_snippets:
+	(week, user) = snippet.getWeekAndUser()
+	snippet_stats.setdefault(user, {})[int(week)] = True
+for user in sorted(snippet_stats.keys()):
+	print user
+	print [ snippet_stats[user].setdefault(k, False) for k in RANGE ]

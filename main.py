@@ -83,11 +83,18 @@ class ProjectHandler(webapp2.RequestHandler):
 		project.description = self.request.get('description')
 		project.members = map(lambda x:x.strip(), self.request.get('members').split(','))
 		project.tags = map(lambda x:x.strip(), self.request.get('tags').split(','))
+		if project.tags == ['']:
+			project.tags = []
 		project.folder = self.request.get('folder')
+		project.calendar = self.request.get('calendar')
 		project.project_lead = self.request.get('project_lead')
 		project.project_areas = self.request.get('project_area', allow_multiple=True)
 		project.project_deliverables = self.request.get('project_deliverables', allow_multiple=True)
 		project.project_resources = self.request.get('project_resources', allow_multiple=True)
+		project_canvas = {}
+		for item in Project.getCanvasFields():
+			project_canvas[item] = self.request.get(item)
+		project.canvas = project_canvas
 		project.put()
 		self.redirect('/project/%s' % projectId)
 
@@ -103,11 +110,18 @@ class NewProjectHandler(webapp2.RequestHandler):
 			members=map(lambda x:x.strip(), self.request.get('members').split(',')))
 		# TODO (arnaud): fix that; this is a repeat of the other method.
 		project.tags = map(lambda x:x.strip(), self.request.get('tags').split(','))
+		if project.tags == ['']:
+			project.tags = []
 		project.folder = self.request.get('folder')
+		project.calendar = self.request.get('calendar')
 		project.project_lead = self.request.get('project_lead')
 		project.project_areas = self.request.get('project_area', allow_multiple=True)
 		project.project_deliverables = self.request.get('project_deliverables', allow_multiple=True)
 		project.project_resources = self.request.get('project_resources', allow_multiple=True)
+		project_canvas = {}
+		for item in Project.getCanvasFields():
+			project_canvas[item] = self.request.get(item)
+		project.canvas = project_canvas
 		project.put()
 		self.redirect('/project/%s' % project.key.id())
 
@@ -118,12 +132,29 @@ from datetime import timedelta
 class WallOfShameHandler(webapp2.RequestHandler):
 	def get(self):
 		(template_data, template) = get_template('templates/wall_of_shame.html')
+		
 		all_users = [k.id() for k in UserProfile.query().fetch(keys_only=True)]
 		current_week = (datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7
+
+		snippet_stats = {}
+		for user in all_users:
+			snippet_stats [user] = {}
+
+		all_snippets = []
+		RANGE = range(36, current_week)
+		for i in RANGE:
+			all_snippets.extend(UserSnippet.getAllSnippetsByWeek(i))
+		for snippet in all_snippets:
+			(week, user) = snippet.getWeekAndUser()
+			snippet_stats.setdefault(user, {})[int(week)] = '1'
+
+		all_users_stats = [ (u, [ snippet_stats[u].setdefault(k, '-1') for k in RANGE ]) for u in all_users ]
+
 		# We check snippets from last week.
 		snippets_good = [k.key.id() for k in UserSnippet.getAllSnippetsByWeek(current_week-1)]
 		template_data['snippets_good'] = sorted(snippets_good)
 		template_data['snippets_bad'] = sorted(list(set(all_users) - set(snippets_good)))
+		template_data['all_users_stats'] = all_users_stats
 		self.response.out.write(template.render(template_data))
 
 class ProjectResourceHandler(webapp2.RequestHandler):

@@ -41,7 +41,7 @@ class SnippetHandler(webapp2.RequestHandler):
       self.redirect('/snippet/%s?embedded=%s' % (myself.email(), isEmbed))
       return
     if _week == None:
-      self.redirect('/snippet/%s/%d?embedded=%s' % (_userEmail, current_week, isEmbed))
+      self.redirect('/snippet/%s/%d?embedded=%s' % (_userEmail, current_week - 1, isEmbed))
       return
 
     # Starting from here, both `_user` and `_week` are properly assigned.
@@ -87,23 +87,66 @@ class SnippetHandler(webapp2.RequestHandler):
     self.redirect('/snippet/%s/%s?embedded=%s' % (userEmail, week, isEmbed))
 
 class AllUserSnippetsHandler(webapp2.RequestHandler):
-  def get(self):
-    current_week = (datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7
+  def get(self, _week=None):
+    current_week = ((datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7) - 1
+    if _week:
+      current_week = int(_week)
     # We get all the snipptet for the week before.
-    snippets = {}
-    for s in UserSnippet.getAllSnippetsByWeek(current_week-1):
-      snippets[s.key.id()] = s.content
+    # 
+    snippets = []
+    for s in sorted(UserSnippet.getAllSnippetsByWeek(current_week), key=lambda x: x.key.id()):
+      snippets.append((s.key.id(), s.content))
     (template_data, template) = get_template('templates/all_snippets.html')
     template_data['snippets'] = snippets
+    template_data['prev_week'] = current_week -1
+    template_data['next_week'] = current_week +1
+    template_data['start_date'] = SnippetHandler.weekRange(current_week)['start']
+    template_data['end_date'] = SnippetHandler.weekRange(current_week)['end']
     self.response.out.write(template.render(template_data))
 
 class MainHandler(webapp2.RequestHandler):
   def get(self):
     self.response.write("default route")
 
+# Support for email
+from email.utils import parseaddr
+from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
+from google.appengine.api import mail
+class SnippetEmailHandler(InboundMailHandler):
+  def receive(self, mail_message):
+    week = ((datetime.today() - SnippetHandler.SNIPPET_START_DATE).days / 7) - 1
+    (name, userEmail) = parseaddr(mail_message.sender)
+    logging.info(userEmail)
+    logging.info(mail_message.bodies('text/plain'))
+    body = [body for (content_type, body) in mail_message.bodies('text/plain')][0]
+    logging.info(body)
+    subject = mail_message.subject if hasattr(mail_message, 'subject') else 'Missing subject field'
+    snippet_data = body.decode()
+    snippet = UserSnippet.getSnippet(userEmail, week)
+    if snippet:
+      snippet.content = snippet.content + "\n" + snippet_data
+      logging.info('Snippet updated;\nadding content %s' % snippet_data)
+    else:
+      snippet = UserSnippet.createSnippet(userEmail, week, snippet_data)
+      logging.info('New snippet created with content:\n%s' % snippet_data)
+    snippet.put()
+    message = mail.EmailMessage()
+    message.sender = "snippets@govlab-intranet.appspotmail.com"
+    message.to = userEmail
+    message.body = """Your snippet has been updated.
+    
+    You can edit your snippet at http://intranet.thegovlab.org/snippet/.
+
+    The snippet master.
+    """
+    message.send()
+    logging.info('Snippet created/updated + reply sent to user.')
+
 app = webapp2.WSGIApplication([
-  (r'/snippet/all', AllUserSnippetsHandler),
+  (r'/snippet/all$', AllUserSnippetsHandler),
+  (r'/snippet/all/(\d+)$', AllUserSnippetsHandler),
   (r'/snippet/(.+)/(.+)', SnippetHandler),
   (r'/snippet/(.+)', SnippetHandler),
   (r'/snippet/', SnippetHandler),
+  (SnippetEmailHandler.mapping()),
   ], debug=True)

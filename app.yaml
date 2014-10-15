@@ -7,6 +7,9 @@ threadsafe: yes
 builtins:
 - remote_api: on
 
+inbound_services:
+- mail
+
 skip_files:
 - ^(.*/)?\.scss$
 - ^(.*/)?\.scssc$
@@ -16,6 +19,10 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+
+- url: /_ah/mail/snippets@govlab-intranet\.appspotmail\.com
+  script: snippet.app
+  login: admin
 
 # static_dir does not accept regex grouping.
 - url: /css
@@ -78,9 +85,12 @@ handlers:
 
 - url: /linkedin
   script: linkedin.app
+  login: required
 
 - url: /linkedin-callback
   script: linkedin.app
+  login: required
+
 
 - url: /dashboard
   script: main.app

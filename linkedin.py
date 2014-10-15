@@ -9,6 +9,8 @@ from linkedin_auth import LinkedinAPI
 from webapp2_extras import sessions
 import json
 
+from domain_services import getMyProfile
+
 class BaseHandler(webapp2.RequestHandler):
 	def dispatch(self):
   # Get a session store for this request.
@@ -48,6 +50,7 @@ class LinkedInHandler(BaseHandler):
 
 class LinkedInCallbackHandler(BaseHandler):
 	def get(self):
+		me = getMyProfile()
 		oauth_token = self.request.get('oauth_token')
 		oauth_verifier = self.request.get('oauth_verifier')
 
@@ -69,9 +72,13 @@ class LinkedInCallbackHandler(BaseHandler):
               oauth_token_secret=final_oauth_token_secret)
 
 # list of fields to choose from: https://developer.linkedin.com/documents/profile-fields
-		profile = l.get('people/~', fields='first-name,last-name,industry,summary,positions')
+		linkedinProfile = l.get('people/~', fields='first-name,last-name,picture-url,industry,summary,positions,educations,skills,interests,languages')
 
-		self.response.write("<pre>%s</pre>" % json.dumps(profile, indent=2))
+		me.linkedin = { 'oauth_token': final_oauth_token,
+		'oauth_token_secret': final_oauth_token_secret,
+		'profile': linkedinProfile}
+		me.put()
+		self.response.write("<h1>LinkedIn profile retrieved successfully.</h1><pre>%s</pre>" % json.dumps(linkedinProfile, indent=2))
 
 config = {}
 config['webapp2_extras.sessions'] = {

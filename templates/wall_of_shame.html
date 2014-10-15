@@ -14,9 +14,27 @@ li.good::before {
 
 </style>
 
+<script type="text/javascript" src="/includes/jquery.sparkline.min.js"></script>
+
 {%endblock %}
 
 {% block content %}
+
+<section class="b-centered b-content">
+<h1><a name="stats">Snippet completion stats</a></h1>
+
+<ul>
+{% for user_stat in all_users_stats %}
+<li><span style="display:inline-block; width:200px;">{{user_stat[0]}}</span> <span style="margin-left: 50px;" class="tristate">{{user_stat[1]|asList}}</span></li>
+{% endfor %}
+</ul>
+
+<script>
+$('.tristate').sparkline('html', {type: 'tristate',
+	'tooltipValueLookups': { 'map': { '-1': 'Missing', '0': 'N/A', '1': 'Submitted' } } });
+</script>
+
+</section>
 
 <section class="b-centered b-content">
 <h1>Snippet completion (for last week)</h1>

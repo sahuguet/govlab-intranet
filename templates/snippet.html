@@ -85,7 +85,7 @@
             basePath: '/includes/EpicEditor-v0.2.2',
             clientSideStorage: false,
             textarea: 'snippet_data',
-            autogrow: false,
+            autogrow: true,
             {% if edit %} button: { fullscreen: false } {% else %} button: false {% endif %}
           };
           var editor = new EpicEditor(options).load();

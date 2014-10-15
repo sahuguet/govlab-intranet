@@ -2,9 +2,15 @@
 {% block title %}The GovLab Team{% endblock %}
 
 {% macro userProfile(user) -%}
-    <li><img class="avatar" alt="{{user|fullName}}" src="{{user.photoUrl|defaultPicture}}"/>	
+    <li><img class="avatar" alt="{{user|fullName}}" src="{{user.photoUrl|defaultPicture}}"/>
+    	{% if user.linkedin %}
+    	<img class="avatar" alt="{{user|fullName}} LinkedIn picture" src="{{user.linkedin.profile.pictureUrl}}"/>
+    	{% endif %}
+    	<p>
     	<a href="/profile?user_email={{user|primaryEmail}}">{{user|fullName}}</a>
     	<a href="mailto:{{user|primaryEmail}}"><i class="fa fa-paper-plane"></i></a>
+    	<a target="__new__" href="/snippet/{{user|primaryEmail}}"><i class="fa fa-file-text-o"></i></a>
+    </p>
     	</li>
 {%- endmacro %}
 

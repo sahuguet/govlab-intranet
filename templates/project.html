@@ -23,9 +23,19 @@
 
 {% block content %}
 
+<section class="b-centered b-content">
+<ul>
+  <li><a href="#main">Project key details</a></li>
+  <li><a href="#resources">Project resources</a></li>
+  {% if project.key %}
+  <li><a href="#canvas">Project canvas</a></li>
+  {% endif %}
+</ul>
+</section>
+
 <form action="/project/{{project.key.id() if project.key else 'new'}}" METHOD="POST">
 
-<section class="b-centered b-content">
+<section id="main" class="b-centered b-content">
   <h1>Project: {{project.title}}</h1>
   
 <div class="b-form-section">
@@ -63,16 +73,19 @@
     <input type="text" class="form-control" placeholder="tags" name="tags" value="{{project.tags|asList}}">
 
     <label for="name">Team</label>
-    <input type="text" class="form-control" placeholder="Team members" name="members" value="{{project.members|asList}}">
+    <input type="text" class="form-control" placeholder="Team members (comma separated; use full GovLab email address)" name="members" value="{{project.members|asList}}">
 
     <label for="name">Project Lead</label>
-    <input type="text" class="form-control" placeholder="Team members" name="project_lead" value="{{project.project_lead}}">
+    <input type="text" class="form-control" placeholder="Team lead (use full GovLab email address)" name="project_lead" value="{{project.project_lead}}">
 
     <label for="name">Project description</label>
     <textarea class="form-control" cols="80" rows="4" placeholder="Provide a short description of the project" name="description">{{project.description}}</textarea>
 
     <label for="name">Google Drive Folder</label>
     <input type="text" class="form-control" placeholder="Project folder" name="folder" value="{{project.folder}}">
+
+    <label for="name">Google Calendar (if any)</label>
+    <input type="text" class="form-control" placeholder="Project calendar" name="calendar" value="{{project.calendar}}">
 
   </div>
 
@@ -81,7 +94,7 @@
   {% if project.key %}
     <label for="name">Weekly snippet</label>
     <div id="b-snippets" class="e-half-content">
-      <iframe src="/project-snippet/{{project.key.id()}}?embedded=true" height="400px" frameborder="0" width="100%"></iframe>
+      <iframe src="/project-snippet/{{project.key.id()}}?embedded=true" height="600px" frameborder="0" width="100%"></iframe>
     </div>
   {% endif %}
   </div>
@@ -109,7 +122,7 @@
 
 </section>
 
-<section class="b-centered b-content">
+<section id="resources" class="b-centered b-content">
   <h1>Resources &amp; Needs</h1>
 
 <div class="b-half">
@@ -182,6 +195,11 @@
     <button type="submit" class="b-button">Update the project</button>
   </div>
 </section>
+
+{% if project.key %}
+{% include 'templates/project_canvas.html' %}
+{% endif %}
+
 
 </form>
 
