@@ -108,6 +108,7 @@ def getUserLinkedinData():
 #for user in service.users().list(domain='thegovlab.org', maxResults=500).execute()['users']:
 #	print user['primaryEmail']
 
+"""
 RANGE = range(36,42)
 all_users = UserProfile.query().fetch()
 snippet_stats = {}
@@ -123,3 +124,37 @@ for snippet in all_snippets:
 for user in sorted(snippet_stats.keys()):
 	print user
 	print [ snippet_stats[user].setdefault(k, False) for k in RANGE ]
+"""
+
+"""
+all_users = []
+for user in UserProfile.query().fetch():
+	experience = 'N/A'
+	if user.profile:
+		experience = json.loads(user.profile)['experience']
+	all_users.append({ 'fname': str(user.fname),
+		'lname': str(user.lname),
+		'email': str(user.email),
+		'photoUrl': str(user.photoUrl),
+		'experience': str(experience) })
+
+
+import yaml
+print yaml.dump(all_users, default_flow_style=False)
+"""
+"""
+import yaml
+all_projects = []
+for project in Project.query().fetch():
+	all_projects.append({ 'title': str(project.title),
+		'description': project.description,
+		'tags': map(lambda x:str(x), project.tags),
+		'areas': map(lambda x:str(x), project.project_areas) })
+print yaml.dump(all_projects, default_flow_style=False, allow_unicode=True)
+"""
+from domain_services import getDomainUsers
+currentUsers = [ k.id() for k in UserProfile.query().fetch(keys_only=True)]
+domainUsers = [ k for k in getDomainUsers() if k['orgUnitPath'] == '/']
+missingUsers = [k for k in domainUsers if k['primaryEmail'] not in currentUsers]
+print len(missingUsers)
+print [k['primaryEmail'] for k in missingUsers]

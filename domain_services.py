@@ -52,3 +52,25 @@ def createNewUser(fname, lname, email):
 		logging.info('User %s created.' % email)
 	else:
 		logging.error('User already exists.')
+
+def getDomainUsers():
+	import httplib2
+	from apiclient.discovery import build
+	from oauth2client.client import SignedJwtAssertionCredentials
+	SERVICE_ACCOUNT_EMAIL = '185449059606-fevoglds8eifup46cn6p6aph7vg5oihj@developer.gserviceaccount.com'
+	if os.environ['SERVER_SOFTWARE'].startswith('Development'):
+		SERVICE_ACCOUNT_PKCS12_FILE_PATH = '__SECRETS__/govlab-intranet.p12'
+	else:
+		SERVICE_ACCOUNT_PKCS12_FILE_PATH = '__SECRETS__/govlab-intranet.pem'
+	USER_DELEGATION = 'arnaud@thegovlab.org'
+	f = file(SERVICE_ACCOUNT_PKCS12_FILE_PATH, 'rb')
+	key = f.read()
+	f.close()
+	credentials = SignedJwtAssertionCredentials(SERVICE_ACCOUNT_EMAIL,
+		key,
+		scope=['https://www.googleapis.com/auth/admin.directory.user'],
+		sub=USER_DELEGATION)
+	http = httplib2.Http()
+	http = credentials.authorize(http)
+	service = build('admin', 'directory_v1', http=http)
+	return service.users().list(domain='thegovlab.org', maxResults=500, orderBy='familyName').execute()['users']

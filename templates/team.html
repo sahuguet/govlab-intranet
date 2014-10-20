@@ -17,7 +17,7 @@
 {% block content %}
 
 <section class="b-centered b-content">
-	<h2>The GovLab Team</h2>
+	<h2>The GovLab Team ({{team|length}})</h2>
 		<ul>
 		{% for user in team %}
     	{{userProfile(user)}}

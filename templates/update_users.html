@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+{% block title %}The GovLab Academy{% endblock %}
+
+{% block content %}
+
+<section class="b-centered b-content">
+{% if new_users %}
+	<ul>
+		{% for user in new_users %}
+		<li>{{user}}</li>
+		{% endfor %}
+	</ul>
+	<form method="POST" action="/update-users">
+		<input type="submit" value="Add new users">
+	</form>
+{% else %}
+No new user.
+{% endif %}	
+</section>
+
+
+{% endblock %}

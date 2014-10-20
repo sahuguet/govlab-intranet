@@ -18,7 +18,6 @@ class MainHandler(webapp2.RequestHandler):
 	def get(self):
 		(template_data, template) = get_template('templates/main.html')
 		template_data['test'] = 'test'
-		logging.info(template_data)
 		self.response.out.write(template.render(template_data))
 
 class TeamHandler(webapp2.RequestHandler):
@@ -50,9 +49,7 @@ class ProfileHandler(webapp2.RequestHandler):
 	def post(self):
 		user = users.get_current_user()
 		profileId = self.request.get('profileId')
-		logging.info('Fetching profile for %s' % profileId)
 		userProfile = UserProfile.getFromEmail(profileId)
-		logging.info(userProfile)
 		if userProfile is None or canEditThisProfile == False:
 			self.abort(404)
 		user_profile_json = {}
@@ -60,7 +57,6 @@ class ProfileHandler(webapp2.RequestHandler):
 			user_profile_json[field] = self.request.get(field)
 		userProfile.profile = json.dumps(user_profile_json)
 		userProfile.put()
-		logging.info('profile stored for %s' % profileId)
 		self.redirect('/profile?user_email=%s' % profileId)
 
 class AllProjectsHandler(webapp2.RequestHandler):
@@ -162,6 +158,26 @@ class ProjectResourceHandler(webapp2.RequestHandler):
 		(template_data, template) = get_template('templates/project_resource.html')
 		self.response.out.write(template.render(template_data))
 
+class UpdateUsersHandler(webapp2.RequestHandler):
+	def get(self):
+		(template_data, template) = get_template('templates/update_users.html')
+		from domain_services import getDomainUsers
+		currentUsers = [ k.id() for k in UserProfile.query().fetch(keys_only=True)]
+		domainUsers = [ k for k in getDomainUsers() if k['orgUnitPath'] == '/']
+		missingUsers = [k for k in domainUsers if k['primaryEmail'] not in currentUsers]
+		template_data['new_users'] = [k['primaryEmail'] for k in missingUsers]
+		self.response.out.write(template.render(template_data))
+
+	def post(self):
+		from domain_services import getDomainUsers, createNewUser
+		currentUsers = [ k.id() for k in UserProfile.query().fetch(keys_only=True)]
+		domainUsers = [ k for k in getDomainUsers() if k['orgUnitPath'] == '/']
+		missingUsers = [k for k in domainUsers if k['primaryEmail'] not in currentUsers]
+		for user in missingUsers:
+			createNewUser(user['name']['givenName'], user['name']['familyName'], user['primaryEmail'])
+			logging.info("Creating user %s:" % user['primaryEmail'])
+		self.redirect('/update-users')
+
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
 	('/team', TeamHandler),
@@ -170,5 +186,6 @@ app = webapp2.WSGIApplication([
 	(r'/project/(\d+)$', ProjectHandler),
 	('/project/new', NewProjectHandler),
 	('/wall-of-shame', WallOfShameHandler),
-	('/project-resource', ProjectResourceHandler)
+	('/project-resource', ProjectResourceHandler),
+	('/update-users', UpdateUsersHandler)
 ], debug=True)
