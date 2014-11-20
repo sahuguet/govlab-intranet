@@ -19,11 +19,10 @@ def auth_func():
   #return (raw_input('Username:'), getpass.getpass('Password:'))
 	return ('arnaud@thegovlab.org', password)
 
-remote_api_stub.ConfigureRemoteApi(None, '/_ah/remote_api', auth_func,
-  'govlab-intranet.appspot.com'
-  )
+#remote_api_stub.ConfigureRemoteApi(None, '/_ah/remote_api', auth_func,
+#  'govlab-intranet.appspot.com'
+#  )
 
-"""
 import httplib2
 from apiclient.discovery import build
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -35,12 +34,83 @@ key = f.read()
 f.close()
 credentials = SignedJwtAssertionCredentials(SERVICE_ACCOUNT_EMAIL,
 	key,
-	scope=['https://www.googleapis.com/auth/admin.directory.user'],
+#	scope=['https://www.googleapis.com/auth/admin.directory.user'],
+	scope=['https://www.googleapis.com/auth/calendar.readonly'],
 	sub=USER_DELEGATION)
 http = httplib2.Http()
 http = credentials.authorize(http)
-service = build('admin', 'directory_v1', http=http)
+#service = build('admin', 'directory_v1', http=http)
+
+service = build(serviceName='calendar', version='v3', http=http)
+
+calendar = service.calendars().get(calendarId='big-screens@thegovlab.org').execute()
+print calendar
+
+from datetime import datetime
+from datetime import timedelta
+
+
+import pytz
+today = datetime.now(pytz.timezone('US/Eastern'))
+oneday = today + timedelta(days=1)
+oneweek = today + timedelta(days=7)
+onemonth = today + timedelta(days=30)
+
+dateFormat = lambda x:x.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+PARAMS = { 'calendarId':'big-screens@thegovlab.org',
+	'singleEvents':True,
+	'timeMin': dateFormat(today),
+	'orderBy':'startTime' }
+
+def getEventsForToday():
+	params = PARAMS.copy()
+	params['timeMax'] = dateFormat(oneday)
+	return getEvents(params)
+
+def getEventsForNextWeek():
+	params = PARAMS.copy()
+	params['timeMax'] = dateFormat(oneweek)
+	return getEvents(params)
+
+def getEventsForNextMonth():
+	params = PARAMS.copy()
+	params['timeMax'] = dateFormat(onemonth)
+	return getEvents(params)
+
+def getEvents(query_params):
+	params = query_params
+	print params
+	page_token = None
+	all_events = []
+	while True:
+		if page_token:
+			params['pageToken']=page_token
+		events = service.events().list(**params).execute()
+		for event in events['items']:
+			all_events.append(event)
+		page_token = events.get('nextPageToken')
+		if not page_token:
+			break
+	return all_events
+
+print "TODAY"
+for event in getEventsForToday():
+	print event['summary'], event['start'], event['end']
+
+print "7days"
+for event in getEventsForNextWeek():
+	print event['summary'], event['start'], event['end']
+
+print "30days"
+for event in getEventsForNextMonth():
+	print event['summary'], event['start'], event['end']
+
+"""Scope for security setup:
+
+http://www.googleapis.com/auth/admin.directory.user, https://www.googleapis.com/auth/admin.directory.user, https://www.googleapis.com/auth/calendar.readonly
 """
+
 
 #print service.users()
 
@@ -152,9 +222,12 @@ for project in Project.query().fetch():
 		'areas': map(lambda x:str(x), project.project_areas) })
 print yaml.dump(all_projects, default_flow_style=False, allow_unicode=True)
 """
+
+"""
 from domain_services import getDomainUsers
 currentUsers = [ k.id() for k in UserProfile.query().fetch(keys_only=True)]
 domainUsers = [ k for k in getDomainUsers() if k['orgUnitPath'] == '/']
 missingUsers = [k for k in domainUsers if k['primaryEmail'] not in currentUsers]
 print len(missingUsers)
 print [k['primaryEmail'] for k in missingUsers]
+"""

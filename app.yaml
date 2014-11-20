@@ -53,6 +53,9 @@ handlers:
   script: main.app
   login: required
 
+- url: /bigscreens
+  script: bigscreens.app
+
 - url: /snippet/.*
   script: snippet.app
   login: required
